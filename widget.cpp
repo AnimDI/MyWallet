@@ -151,7 +151,12 @@ Widget::Widget(QWidget *parent)
         "}"
         );
     horizontalLayout_3->addWidget(pushButton_2);
+    error = new QLabel(this);
+    error->setVisible(false);
+    error->setAlignment(Qt::AlignCenter);
+    error->setStyleSheet("color: #d14545; font-size: 14px; font-weight: 500; margin-top: 15px;");
 
+    verticalLayout->addWidget(error);
     QSpacerItem *horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     horizontalLayout_3->addSpacerItem(horizontalSpacer_2);
 
@@ -187,7 +192,11 @@ void Widget::button_loginClick()
 {
     QString login = lineEditLogin->text();
     QString password = lineEditPassword->text();
-
+    if(login.isEmpty() || password.isEmpty()){
+        error->setText("Заполните логин и пароль");
+        error->setVisible(true);
+        return;
+    }
     QSqlQuery query;
     query.prepare("SELECT id, password FROM users WHERE login = ?");
     query.addBindValue(login);
@@ -206,7 +215,8 @@ void Widget::button_loginClick()
             //window2.show();
 
         } else {
-        qDebug() << "Пользователь не найден";
+            error->setText("Пользователь не найден или не верный пароль");
+            error->setVisible(true);
     }
     }
 }
@@ -216,7 +226,8 @@ void Widget::button_regClick()
     QString password = lineEditPassword->text();
 
     if (login.isEmpty() || password.isEmpty()) {
-        qDebug() << "Заполните логин и пароль";
+        error->setText("Заполните логин и пароль");
+        error->setVisible(true);
         return;
     }
 
@@ -226,7 +237,8 @@ void Widget::button_regClick()
     query.addBindValue(login);
     if(query.exec()){
         if(query.next()){
-            qDebug()<<"данный логин уже используется";
+            error->setText("Данный логин уже используется");
+            error->setVisible(true);
             return;
         }
 

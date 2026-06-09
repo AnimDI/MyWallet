@@ -27,7 +27,7 @@ private:
     int userId;
     QString userLogin;
     QLineEdit *lineEditLogin;
-
+    QLabel *error;
     QLineEdit *lineEditPassword;
     QPushButton *pushButton;
     QPushButton *pushButton_2;

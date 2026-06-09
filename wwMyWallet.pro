@@ -8,10 +8,12 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
+    redactor.cpp \
     secondwindow.cpp \
     widget.cpp
 
 HEADERS += \
+    redactor.h \
     secondwindow.h \
     widget.h
 

@@ -11,7 +11,7 @@
 #include <QSqlQuery>
 #include <QSqlDatabase>
 #include <QIntValidator>
-
+#include <redactor.h>
 class secondwindow : public QMainWindow
 {
     Q_OBJECT
@@ -41,7 +41,8 @@ private:
     QLabel *rasxod;
     QLabel *doxod;
     QStatusBar *statusbar;
-
+    QLabel *status;
+    redactor *editor;
     QSqlDatabase db;
 };
 

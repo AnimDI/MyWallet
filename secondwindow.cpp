@@ -26,7 +26,7 @@ secondwindow::secondwindow(int userId, QString userLogin, QWidget *parent)
 
     QHBoxLayout *topLayout = new QHBoxLayout();
 
-    // баланс
+
     QGridLayout *balanceLayout = new QGridLayout();
     balance = new QLabel("0");
     balance->setStyleSheet("color: #2e7d5e; font-size: 30px; font-weight: 800;");
@@ -50,7 +50,7 @@ secondwindow::secondwindow(int userId, QString userLogin, QWidget *parent)
     balanceLayout->addWidget(rasxod, 2, 1);
     topLayout->addLayout(balanceLayout);
 
-    // добавление
+
     QGridLayout *formLayout = new QGridLayout();
     QLabel *dateLabel = new QLabel("Дата");
     dateLabel->setAlignment(Qt::AlignCenter);
@@ -73,7 +73,7 @@ secondwindow::secondwindow(int userId, QString userLogin, QWidget *parent)
 
     topLayout->addLayout(formLayout);
 
-    // кнопка "+"
+
     pushButton = new QPushButton("+");
     pushButton->setFixedSize(80, 80);
     pushButton->setStyleSheet("background-color: #2e7d5e; color: white; font-size: 70px; font-weight: bold; border-radius: 40px; text-align: center;");
@@ -81,10 +81,10 @@ secondwindow::secondwindow(int userId, QString userLogin, QWidget *parent)
 
     mainLayout->addLayout(topLayout, 0, 0);
 
-    // Список и кнопки управления
+
     QHBoxLayout *bottomLayout = new QHBoxLayout();
 
-    // кнопка "Удалить"
+
     reload_2 = new QPushButton("Удалить");
     reload_2->setFixedSize(80, 80);
     reload_2->setStyleSheet("background-color: #2e7d5e; color: white; font-size: 14px; font-weight: bold; border-radius: 40px; text-align: center;");
@@ -94,7 +94,7 @@ secondwindow::secondwindow(int userId, QString userLogin, QWidget *parent)
     list->setFont(QFont("Arial", 14));
     list->setStyleSheet("background-color: white; border: 2px solid #2e7d5e; padding: 15px;");
 
-    // кнопка "Обновить"
+
     reload = new QPushButton("Обновить");
     reload->setFixedSize(80, 80);
     reload->setStyleSheet("background-color: #2e7d5e; color: white; font-size: 14px; font-weight: bold; border-radius: 40px; text-align: center;");
@@ -105,16 +105,22 @@ secondwindow::secondwindow(int userId, QString userLogin, QWidget *parent)
 
     mainLayout->addLayout(bottomLayout, 1, 0);
 
-    statusbar = new QStatusBar(this);
-    setStatusBar(statusbar);
+    // statusbar = new QStatusBar(this);
+    // setStatusBar(statusbar);
+    status = new QLabel(this);
+    status->setVisible(false);
+    status->setAlignment(Qt::AlignCenter);
+    status->setStyleSheet("color: #d14545; font-size: 14px; font-weight: 500; margin-top: 15px;");
 
-    // подключения сигналов
+    mainLayout->addWidget(status, 2, 0, Qt::AlignCenter);
+
+
     connect(pushButton, &QPushButton::clicked, this, &secondwindow::on_pushButton_clicked);
     connect(reload, &QPushButton::clicked, this, &secondwindow::on_reload_clicked);
     connect(reload_2, &QPushButton::clicked, this, &secondwindow::on_reload_2_clicked);
     connect(list, &QListWidget::itemDoubleClicked, this, &secondwindow::on_list_itemDoubleClicked);
 
-    // база данных
+
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("./MyWalletDB.db");
     if (!db.open()) {
@@ -140,7 +146,8 @@ void secondwindow::on_pushButton_clicked()
     QString date = enterDate->text();
 
     if (summ == 0 || coment.isEmpty() || date.isEmpty()) {
-        statusbar->showMessage("Заполните все поля", 3000);
+        status->setText("Заполните все поля");
+        status->setVisible(true);
         return;
     }
 
@@ -156,13 +163,18 @@ void secondwindow::on_pushButton_clicked()
     query.addBindValue(coment);
 
     if (query.exec()) {
-        statusbar->showMessage("Операция добавлена", 3000);
+
+        status->setText("Операция добавлена");
+        status->setVisible(true);
         enterSumm->clear();
         etnerText->clear();
         enterDate->clear();
         on_reload_clicked();
     } else {
-        statusbar->showMessage("Ошибка: " + query.lastError().text(), 5000);
+        status->setText("Ошибка: " + query.lastError().text());
+        status->setVisible(true);
+
+
     }
 }
 
@@ -203,6 +215,7 @@ void secondwindow::on_reload_clicked()
     balance->setText(QString::number(endSumm));
     rasxod->setText(QString::number(rasxodSum));
     doxod->setText(QString::number(doxodSum));
+
 }
 
 void secondwindow::on_reload_2_clicked()
@@ -210,6 +223,8 @@ void secondwindow::on_reload_2_clicked()
     QListWidgetItem *currentItem = list->currentItem();
     if (!currentItem) {
         statusbar->showMessage("Не выбран элемент", 3000);
+        status->setText("не выбран элемент");
+        status->setVisible(true);
         return;
     }
 
@@ -223,13 +238,18 @@ void secondwindow::on_reload_2_clicked()
         statusbar->showMessage("Удалено", 3000);
         on_reload_clicked();
     } else {
-        statusbar->showMessage("Ошибка удаления: " + query.lastError().text(), 5000);
+
+        status->setText("Ошибка удаления"+query.lastError().text());
+        status->setVisible(true);
     }
 }
 
 void secondwindow::on_list_itemDoubleClicked(QListWidgetItem *item)
 {
     int id = item->data(Qt::UserRole).toInt();
-    // Здесь можно открыть окно редактора
-    statusbar->showMessage("Редактирование записи " + QString::number(id), 3000);
+
+    editor = new redactor(m_userId, id, this);
+    editor->show();
+
+
 }
